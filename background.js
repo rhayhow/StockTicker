@@ -1,12 +1,8 @@
-var pollInterval = 1000 * 60; // 1 minute
+var pollInterval = 1000 * 60 * 1; // 5 minutes
 
 function updateStocks(callback, errorCallback, notificationCallback) {
-  // Google image search - 100 searches per day.
-  // https://developers.google.com/image-search/
-  //var searchUrl = 'https://ajax.googleapis.com/ajax/services/search/images' +
-  //  '?v=1.0&q=' + encodeURIComponent(searchTerm);
-    
-   var searchUrl = 'https://www.google.com/finance/info?q=NSE:A,KEYS,.INX,TNX,.DJI'
+ 
+  var searchUrl = 'https://www.google.com/finance/info?q=NSE:A,KEYS,.INX,TNX,.DJI'
   var x = new XMLHttpRequest();
   x.open('GET', searchUrl);
   // The Google image search API responds with JSON, so let Chrome parse it.
@@ -36,17 +32,8 @@ function updateStocks(callback, errorCallback, notificationCallback) {
               var pctChange = (ticker[i].c/ticker[i].pcls_fix) * 100;
               result = result + '   Changed % ' + pctChange.toFixed(2) + "   \n";
               
-              if(pctChange >=0)
-              {
-              showStockUpNotification(result, 'Agilent Update', 'A');
-              }
-              else
-              {
-              showStockDownNotification(result, 'Agilent Update', 'A');
-              }
-              //showAgilentNotification(result);
-              results = results + result;
-              //return;
+              showStockNotification('Agilent Update', 'A', 'Agilent', ticker[i].l_cur, ticker[i].c, pctChange);
+
         }
       if(ticker[i].t == 'KEYS')
          {
@@ -60,17 +47,8 @@ function updateStocks(callback, errorCallback, notificationCallback) {
               var pctChange = (ticker[i].c/ticker[i].pcls_fix) * 100;
               result = result + '   Changed % ' + pctChange.toFixed(2) + "   \n";
               
-              if(pctChange >=0)
-              {
-              showStockUpNotification(result, 'S&P 500 Update', 'S&P 500');
-              }
-              else
-              {
-              showStockDownNotification(result, 'S&P 500 Update', 'S&P 500');
-              }
-              //showSNPNotification(result);
-              results = results + result;
-              //return;
+              showStockNotification('S&P 500 Update', 'S&P 500', 'The S&P 500', ticker[i].l_cur, ticker[i].c, pctChange);
+
         }
         if(ticker[i].t == 'TNX')
          {
@@ -79,55 +57,53 @@ function updateStocks(callback, errorCallback, notificationCallback) {
               var pctChange = (ticker[i].c/ticker[i].pcls_fix) * 100;
               result = result + '   Changed % ' + pctChange.toFixed(2) + "   \n";
               
-              if(pctChange >=0)
-              {
-              showStockUpNotification(result, '10 Year Treasury Update', 'TNX');
-              }
-              else
-              {
-              showStockDownNotification(result, '10 Year Treasury Update', 'TNX');
-              }
-              //showTBillNotification(result);
-              results = results + result;
-              //return;
+              showStockNotification('10 Year Treasury Update', 'TNX', 'The 10 Year', ticker[i].l_cur, ticker[i].c, pctChange);
+
         }
            if(ticker[i].t == '.DJI')
          {
-              result = 'The Dow is ' + ticker[i].l_cur + "   \n";
+              result = 'The Dow is ' + ticker[i].l_cur + ",";
               result = result + '   Changed ' + ticker[i].c + "   \n";
               var pctChange = (ticker[i].c/ticker[i].pcls_fix) * 100;
               result = result + '   Changed % ' + pctChange.toFixed(2) + "   \n";
               
-              if(pctChange >=0)
-              {
-              showStockUpNotification(result, 'Dow Jones Update', 'DJI');
-              }
-              else
-              {
-              showStockDownNotification(result, 'Dow Jones Update', 'DJI');
-              }
-              results = results + result;
-              //return;
+              showStockNotification('Dow Jones Update', 'DJI', 'The Dow', ticker[i].l_cur, ticker[i].c, pctChange);
+
         }
     }
-    //callback( results);
     return;
-    
-    //var firstResult = response.responseData.results[0];
-    // Take the thumbnail instead of the full image to get an approximately
-    // consistent image size.
-    //var imageUrl = firstResult.tbUrl;
-    //var width = parseInt(firstResult.tbWidth);
-   // var height = parseInt(firstResult.tbHeight);
-   // console.assert(
-    //    typeof imageUrl == 'string' && !isNaN(width) && !isNaN(height),
-   //     'Unexpected respose from the Google Image Search API!');
-   // callback(imageUrl, width, height);
   };
   x.onerror = function() {
     errorCallback('Network error.');
   };
   x.send();
+}
+
+function showStockNotification(notificationName, titleString, stockName, current, change, pctChange)
+{
+      var statusText = stockName + ' is ' + current + ', ' + change + ' (' + pctChange.toFixed(2) + "%)";
+
+if(Math.abs(pctChange) > .25)
+{
+  if(pctChange >= 0)
+                 {
+  chrome.notifications.create(notificationName,{
+        type: 'basic',
+        iconUrl: 'images/upArrow.png',
+        title: titleString,
+        message: statusText
+     }, function(notificationId) {});
+     }
+     else
+     {
+        chrome.notifications.create(notificationName,{
+        type: 'basic',
+        iconUrl: 'images/downArrow.png',
+        title: titleString,
+        message: statusText
+     }, function(notificationId) {});
+     }
+     }
 }
 
 function showStockUpNotification(statusText, notificationName, titleString)
