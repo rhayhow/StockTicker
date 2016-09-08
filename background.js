@@ -1,92 +1,170 @@
-var DEBUG = false;
+var pollInterval = 1000 * 60; // 1 minute
 
-// Create data store
-var clacks = {};
-
-// return clacks headers, called by popup to get them for display
-function getClacks(tabId) {
-    return clacks[tabId];
-};
-
-// safely hide the page action.
-function hidePageAction(tabId) {
-    if (clacks[tabId]) {
-        chrome.pageAction.hide(tabId);
+function updateStocks(callback, errorCallback, notificationCallback) {
+  // Google image search - 100 searches per day.
+  // https://developers.google.com/image-search/
+  //var searchUrl = 'https://ajax.googleapis.com/ajax/services/search/images' +
+  //  '?v=1.0&q=' + encodeURIComponent(searchTerm);
+    
+   var searchUrl = 'https://www.google.com/finance/info?q=NSE:A,KEYS,.INX,TNX,.DJI'
+  var x = new XMLHttpRequest();
+  x.open('GET', searchUrl);
+  // The Google image search API responds with JSON, so let Chrome parse it.
+  //var responseString = x.responseText;
+  x.responseType = 'text';
+ 
+  
+  x.onload = function() {
+    // Parse and process the response from Google Image Search.
+    var response = x.response;
+ 
+    if (!response || response.length == 0) {
+      errorCallback('No response from Google Finance search!');
+      return;
     }
+    var json = response.replace("//", "");
+    
+    var ticker = JSON.parse(json);
+    var results = "";
+    
+    for(i=0;i<ticker.length;i++)
+    {
+       if(ticker[i].t == 'A')
+         {
+              var result = 'Agilent is ' + ticker[i].l_cur + "   \n";
+              result = result + '   Changed ' + ticker[i].c + "   \n";
+              var pctChange = (ticker[i].c/ticker[i].pcls_fix) * 100;
+              result = result + '   Changed % ' + pctChange.toFixed(2) + "   \n";
+              
+              if(pctChange >=0)
+              {
+              showStockUpNotification(result, 'Agilent Update', 'A');
+              }
+              else
+              {
+              showStockDownNotification(result, 'Agilent Update', 'A');
+              }
+              //showAgilentNotification(result);
+              results = results + result;
+              //return;
+        }
+      if(ticker[i].t == 'KEYS')
+         {
+              results = results + 'Keysight is ' + ticker[i].l_cur + "   \n";
+              //return;
+        }
+        if(ticker[i].t == '.INX')
+         {
+              var result = 'The S&P is ' + ticker[i].l_cur + "   \n";
+              result = result + '   Changed ' + ticker[i].c + "   \n";
+              var pctChange = (ticker[i].c/ticker[i].pcls_fix) * 100;
+              result = result + '   Changed % ' + pctChange.toFixed(2) + "   \n";
+              
+              if(pctChange >=0)
+              {
+              showStockUpNotification(result, 'S&P 500 Update', 'S&P 500');
+              }
+              else
+              {
+              showStockDownNotification(result, 'S&P 500 Update', 'S&P 500');
+              }
+              //showSNPNotification(result);
+              results = results + result;
+              //return;
+        }
+        if(ticker[i].t == 'TNX')
+         {
+              var result = 'The 10 year is ' + ticker[i].l_cur + "   \n";
+              result = result + '   Changed ' + ticker[i].c + "   \n";
+              var pctChange = (ticker[i].c/ticker[i].pcls_fix) * 100;
+              result = result + '   Changed % ' + pctChange.toFixed(2) + "   \n";
+              
+              if(pctChange >=0)
+              {
+              showStockUpNotification(result, '10 Year Treasury Update', 'TNX');
+              }
+              else
+              {
+              showStockDownNotification(result, '10 Year Treasury Update', 'TNX');
+              }
+              //showTBillNotification(result);
+              results = results + result;
+              //return;
+        }
+           if(ticker[i].t == '.DJI')
+         {
+              result = 'The Dow is ' + ticker[i].l_cur + "   \n";
+              result = result + '   Changed ' + ticker[i].c + "   \n";
+              var pctChange = (ticker[i].c/ticker[i].pcls_fix) * 100;
+              result = result + '   Changed % ' + pctChange.toFixed(2) + "   \n";
+              
+              if(pctChange >=0)
+              {
+              showStockUpNotification(result, 'Dow Jones Update', 'DJI');
+              }
+              else
+              {
+              showStockDownNotification(result, 'Dow Jones Update', 'DJI');
+              }
+              results = results + result;
+              //return;
+        }
+    }
+    //callback( results);
+    return;
+    
+    //var firstResult = response.responseData.results[0];
+    // Take the thumbnail instead of the full image to get an approximately
+    // consistent image size.
+    //var imageUrl = firstResult.tbUrl;
+    //var width = parseInt(firstResult.tbWidth);
+   // var height = parseInt(firstResult.tbHeight);
+   // console.assert(
+    //    typeof imageUrl == 'string' && !isNaN(width) && !isNaN(height),
+   //     'Unexpected respose from the Google Image Search API!');
+   // callback(imageUrl, width, height);
+  };
+  x.onerror = function() {
+    errorCallback('Network error.');
+  };
+  x.send();
 }
 
-// safely show the page action.
-function showPageAction(tabId) {
-    if (clacks[tabId]) {
-        chrome.pageAction.show(tabId);
-    }
+function showStockUpNotification(statusText, notificationName, titleString)
+{
+  //document.getElementById('status').textContent = statusText;
+  
+  chrome.notifications.create(notificationName,{
+        type: 'basic',
+        iconUrl: 'images/upArrow.png',
+        title: titleString,
+        message: statusText
+     }, function(notificationId) {});
 }
 
+function showStockDownNotification(statusText, notificationName, titleString)
+{
+  //document.getElementById('status').textContent = statusText;
+  
+  chrome.notifications.create(notificationName,{
+        type: 'basic',
+        iconUrl: 'images/downArrow.png',
+        title: titleString,
+        message: statusText
+     }, function(notificationId) {});
+} 
 
-// The main listener to check each request's headers for clacks
-chrome.webRequest.onCompleted.addListener(
-    function(details) {
-        var newClacks,
-            // match case-insensitive, with or without 'X-' prefix
-            pattern = /^(X-)?(Clacks-Overhead)$/i;
-
-        // ignore background requests (where tabId === -1)
-        if (details.tabId >= 0) {
-
-            // get response headers and store those tagged as "Clacks-Overhead"
-            // or "X-Clacks-Overhead"
-            newClacks = details.responseHeaders.filter(function(header) {
-                    return pattern.test(header.name);
-                }).map(function(header) {
-                    return header.value;
-                }).join("\n");
-
-            // if there are any Clacks-Overhead headers.
-            if (newClacks) {
-                // Store the resulting string under its tab's ID.
-                // N.B. though it displays multiple messages from one request, separate
-                // requests from one page load can still overwrite each other.
-                // Note from Pete: I've change += to just = to stop it repeating itself.
-                // - related to premature deletion? - don't think so...
-                clacks[details.tabId] = newClacks;
-                showPageAction(details.tabId);
-                if (DEBUG) console.log("store");
-            }
-        }
-    },
-    {urls: ["<all_urls>"]},
-    ["responseHeaders"]
-);
-
-// clear clacks on navigation to a new page
-chrome.webNavigation.onCommitted.addListener(
-    function(details) {
-        if (details.transitionType !== "auto_subframe") {
-            delete clacks[details.tabId];
-            hidePageAction(details.tabId);
-        }
+function errorCallback(errorMessage) {
+      renderStatus('Cannot display image. ' + errorMessage);
     }
-);
 
-// listen to messages from content scripts
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        var tabId = sender.tab.id;
+function startRequest() {
+  updateStocks();
+  window.setTimeout(startRequest, pollInterval);
+}
 
-        if (request.clacks) {
-            if (clacks[tabId]) clacks[tabId] += "\n" + request.clacks;
-            else clacks[tabId] = request.clacks;
-        }
+function stopRequest() {
+  window.clearTimeout(timerId);
+}
 
-        // if there is a clacks entry for the loaded tab, show icon for that tab.
-        if (clacks[tabId]) showPageAction(tabId);
-        // if (DEBUG) console.log("shown: ", shown[tabId]);
-});
-
-// Keeps the data store clean by deleting entries for tabs when they are closed.
-chrome.tabs.onRemoved.addListener(function (tabId) {
-    if (clacks[tabId]) {
-        delete clacks[tabId];
-    }
-});
-
+onload=startRequest()
