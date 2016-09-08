@@ -21,7 +21,7 @@ chrome.tabs.query(
                 // var iconSize = 19; // icon size, 19 or 38 pixels
 
                 // put icon in popup.html
-                var iconURL = chrome.extension.getURL("images/backspindle_icons/Clacks19/Clacks-Blank-small.png");
+                var iconURL = chrome.extension.getURL("images/upArrow.png");
                 console.log(iconURL);
                 document.getElementById("icon").src = iconURL;
 
@@ -35,7 +35,14 @@ chrome.tabs.query(
                     else str = clacks[letterIndex].toUpperCase();
 
                     // make full string and set src in html
-                    iconURL = chrome.extension.getURL("images/backspindle_icons/Clacks19/Clacks-" + str + "-small.png");
+                    if(letterIndex%2 == 1)
+                    {
+                    iconURL = chrome.extension.getURL("images/downArrow.png");
+                    }
+                    else
+                    {
+                    iconURL = chrome.extension.getURL("images/upArrow.png");
+                    }
                     document.getElementById("icon").src = iconURL;
 
                     // iterate

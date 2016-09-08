@@ -90,11 +90,3 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
     }
 });
 
-// Possible code for filtering duplicate strings
-// function uniqueStrings(list) {
-//     var set = {}, i;
-//     for (i in list) {
-//         set[list[i]] = true;
-//     }
-//     return Object.keys(set);
-// }

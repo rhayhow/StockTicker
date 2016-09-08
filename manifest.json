@@ -1,10 +1,10 @@
 {
-    "name": "Clacks Overhead - GNU Terry Pratchett",
-    "short_name": "Clacks Overhead",
-    "version": "1.7",
+    "name": "Stock Price Notifier",
+    "short_name": "SPN",
+    "version": "0.1",
     "manifest_version": 2,
-    "description": "GNU Terry Pratchett. Show user when 'Clacks-Overhead' appears in HTTP headers.",
-    "author": "Peter Bell",
+    "description": "Stock Price Notifier that creates a notification window based on stock price changes.",
+    "author": "Reid Hayhow",
     "background" : {
         "scripts": ["background.js"],
         "persistent": true
@@ -12,17 +12,14 @@
     "permissions": [
         "<all_urls>",
         "webNavigation",
-        "webRequest"
+        "webRequest",
+        "https://www.google.com/",
+         "notifications"
     ],
-    "icons": { "16": "images/melanie_icon16.png",
-           "48": "images/melanie_icon48.png",
-          "128": "images/melanie_icon128.png" },
+    "icons": { "16" : "images/icon.png"},
     "page_action": {
-        "default_icon": {
-            "19": "images/melanie_icon19.png",
-            "38": "images/melanie_icon38.png"
-         },
-         "default_title": "Clacks Overhead",
+        "default_icon":"images/icon.png",
+         "default_title": "Stock Price Notifier",
          "default_popup": "popup.html"
     },
     "content_scripts": [
