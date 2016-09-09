@@ -1,4 +1,6 @@
-var pollInterval = 1000 * 60 * 5; // 5 minutes
+//load currently stored options configuration
+var timeout_value = localStorage['timeout'];
+var pollInterval = 1000 * 60 * timeout_value; // configured by options
 
 function updateStocks() {
 
@@ -95,7 +97,7 @@ function showStockNotification(notificationName, titleString, stockName, current
         else {
             var downArrowString = 'images/downArrow.png';
             if (pctChange < -1.0) {
-                downArrowString = 'images/downArrowPriority.png'
+                downArrowString = 'images/downArrowPriority.png';
             }
             chrome.notifications.create(notificationName, {
                 type: 'basic',
