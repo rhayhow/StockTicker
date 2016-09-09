@@ -94,7 +94,7 @@ function showStockNotification(notificationName, titleString, stockName, current
         }
         else {
             var downArrowString = 'images/downArrow.png';
-            if (pctChange > 1.0) {
+            if (pctChange < -1.0) {
                 downArrowString = 'images/downArrowPriority.png'
             }
             chrome.notifications.create(notificationName, {
@@ -105,28 +105,6 @@ function showStockNotification(notificationName, titleString, stockName, current
             }, function (notificationId) { });
         }
     }
-}
-
-function showStockUpNotification(statusText, notificationName, titleString) {
-    //document.getElementById('status').textContent = statusText;
-
-    chrome.notifications.create(notificationName, {
-        type: 'basic',
-        iconUrl: 'images/upArrow.png',
-        title: titleString,
-        message: statusText
-    }, function (notificationId) { });
-}
-
-function showStockDownNotification(statusText, notificationName, titleString) {
-    //document.getElementById('status').textContent = statusText;
-
-    chrome.notifications.create(notificationName, {
-        type: 'basic',
-        iconUrl: 'images/downArrow.png',
-        title: titleString,
-        message: statusText
-    }, function (notificationId) { });
 }
 
 function errorCallback(errorMessage) {
