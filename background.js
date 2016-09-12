@@ -75,8 +75,18 @@ function updateStocks() {
 
 function showStockNotification(notificationName, titleString, stockName, current, change, pctChange) {
     var statusText = stockName + ' is ' + current + ', ' + change + ' (' + pctChange.toFixed(2) + "%)";
-    var normal_threshold_value = localStorage['normal_threshold'];
-    var special_threshold_value = localStorage['special_threshold'];
+
+    var normal_threshold_value = .25;
+    if (localStorage['normal_threshold'] !== null)
+    {
+        normal_threshold_value = localStorage['normal_threshold'];
+    }
+        
+    var special_threshold_value = 1.0;
+    if (localStorage['special_threshold'] !== null)
+    {
+        special_threshold_value = localStorage['special_threshold'];
+    }
 
     if (Math.abs(pctChange) > normal_threshold_value) {
         var upArrowString = 'images/upArrow.png';
@@ -123,7 +133,7 @@ function startRequest() {
     else {
         chrome.notifications.create('All Done', {
             type: 'basic',
-            iconUrl: 'images/icon.png',
+            iconUrl: 'images/icon_128.png',
             title: 'Market Closed',
             message: 'No more notifications, market closed.'
         }, function (notificationId) { });
@@ -134,7 +144,6 @@ function stopRequest() {
     window.clearTimeout(timerId);
 }
 
-// This block is new!
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
       if (request.message === "options_saved") {

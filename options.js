@@ -79,7 +79,7 @@ function save_options() {
     localStorage['special_threshold'] = special_threshold_value;
 
     chrome.runtime.sendMessage({ "message": "options_saved"});
-};
+}
 
 
 //bind events to dom elements
