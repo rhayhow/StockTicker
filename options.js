@@ -77,6 +77,8 @@ function save_options() {
     localStorage['normal_threshold'] = normal_threshold_value;
 
     localStorage['special_threshold'] = special_threshold_value;
+
+    chrome.runtime.sendMessage({ "message": "options_saved"});
 };
 
 

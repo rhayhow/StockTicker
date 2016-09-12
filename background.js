@@ -134,4 +134,13 @@ function stopRequest() {
     window.clearTimeout(timerId);
 }
 
+// This block is new!
+chrome.runtime.onMessage.addListener(
+  function (request, sender, sendResponse) {
+      if (request.message === "options_saved") {
+          startRequest();
+      }
+  }
+);
+
 onload = startRequest();
