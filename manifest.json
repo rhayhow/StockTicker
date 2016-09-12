@@ -5,8 +5,8 @@
     "manifest_version": 2,
     "description": "Stock Price Notifier that creates a notification window based on stock price changes.",
     "author": "Reid Hayhow",
-    "background" : {
-        "scripts": ["background.js"],
+    "background": {
+        "scripts": [ "background.js" ],
         "persistent": true
     },
     "permissions": [
@@ -14,18 +14,23 @@
         "webNavigation",
         "webRequest",
         "https://www.google.com/",
-         "notifications"
+        "notifications"
     ],
-    "icons": { "16" : "images/icon.png"},
-    "page_action": {
-        "default_icon":"images/icon.png",
-         "default_title": "Stock Price Notifier",
-         "default_popup": "popup.html"
+    "icons": {
+        "16": "images/icon_16.png",
+        "48": "images/icon_48.png",
+        "128": "images/icon_128.png"
     },
+    "page_action": {
+        "default_icon": "images/icon_128.png",
+        "default_title": "Stock Price Notifier",
+        "default_popup": "popup.html"
+    },
+    "options_page": "options.html",
     "content_scripts": [
         {
-          "matches": ["<all_urls>"],
-          "js": ["content.js"]
+            "matches": [ "<all_urls>" ],
+            "js": [ "content.js" ]
         }
     ]
 }

@@ -1,0 +1,62 @@
+<html>
+<head>
+    <!-- load javascript: jQuery 1.9.1 - http://jquery.com/ -->
+    <script type="text/javascript" src="../js/jquery-1.9.1.min.js"></script>
+
+    <!-- load javascript: Bootstrap v2.3.0 - http://twitter.github.com/bootstrap/ -->
+    <script type="text/javascript" src="../js/bootstrap.min.js"></script>
+
+    <!-- load stylesheets: Bootstrap v2.3.0 - http://twitter.github.com/bootstrap/index.html -->
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+
+    <!-- load stylesheets: internal -->
+    <link rel="stylesheet" type="text/css" href="../css/global.css">
+    <link rel="stylesheet" type="text/css" href="../css/options.css">
+</head>
+<body>
+    <div id="options-outer">
+        <div id="options-inner">
+            <div id="options-page-title" class="page-title">Stock Price Notifier Options</div>
+            <div id="options-page-subtitle" class="page-subtitle">Configuration and Settings</div><br />
+            <div id="options-area">
+                <div class="control-group">
+                    <label class="control-label" for="timeout-dropdown">How often to refresh stock prices?</label>
+                    <div class="controls">
+                        <select id="timeout-dropdown" class="span3">
+                            <option value="1">Refresh after 1 minute.</option>
+                            <option value="5">Refresh after 5 minutes.</option>
+                            <option value="15">Refresh after 15 minutes.</option>
+                            <option value="30">Refresh after 30 minutes.</option>
+                        </select>
+                    </div>
+                    <label class="control-label" for="threshold-dropdown">What percentage change triggers a normal alert?</label>
+                    <div class="controls">
+                        <select id="threshold-dropdown" class="span3">
+                            <option value=".01">.1%</option>
+                            <option value=".25" selected>.25%</option>
+                            <option value=".5">.50%</option>
+                            <option value="1">1%</option>
+                        </select>
+                    </div>
+                    <label class="control-label" for="special-threshold-dropdown">What percentage change triggers a special alert?</label>
+                    <div class="controls">
+                        <select id="special-threshold-dropdown" class="span3">
+                            <option value=".25">.25%</option>
+                            <option value=".5">.50%</option>
+                            <option value="1" selected>1%</option>
+                            <option value="1.5">1.5%</option>
+                            <option value="2">2%</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <button id="save-options-button" class="btn btn-success">Save Options</button><div id="status"></div>
+        </div>
+    </div>
+
+    <!-- load javascript: unique html page javascript file -->
+    <script type="text/javascript" src="options.js"></script>
+
+    
+</body>
+</html>

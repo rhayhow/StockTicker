@@ -1,7 +1,6 @@
-var pollInterval = 1000 * 60 * 5; // 5 minutes
+
 
 function updateStocks() {
-
     var searchUrl = 'https://www.google.com/finance/info?q=NSE:A,KEYS,.INX,TNX,.DJI';
     var x = new XMLHttpRequest();
     x.open('GET', searchUrl);
@@ -77,11 +76,21 @@ function updateStocks() {
 function showStockNotification(notificationName, titleString, stockName, current, change, pctChange) {
     var statusText = stockName + ' is ' + current + ', ' + change + ' (' + pctChange.toFixed(2) + "%)";
 
+    var normal_threshold_value = .25;
+    if (localStorage['normal_threshold'] !== null)
+    {
+        normal_threshold_value = localStorage['normal_threshold'];
+    }
+        
+    var special_threshold_value = 1.0;
+    if (localStorage['special_threshold'] !== null)
+    {
+        special_threshold_value = localStorage['special_threshold'];
+    }
 
-
-    if (Math.abs(pctChange) > .25) {
+    if (Math.abs(pctChange) > normal_threshold_value) {
         var upArrowString = 'images/upArrow.png';
-        if (pctChange > 1.0) {
+        if (pctChange > special_threshold_value) {
             upArrowString = 'images/upArrowPriority.png';
         }
         if (pctChange >= 0) {
@@ -95,7 +104,7 @@ function showStockNotification(notificationName, titleString, stockName, current
         else {
             var downArrowString = 'images/downArrow.png';
             if (pctChange < -1.0) {
-                downArrowString = 'images/downArrowPriority.png'
+                downArrowString = 'images/downArrowPriority.png';
             }
             chrome.notifications.create(notificationName, {
                 type: 'basic',
@@ -112,6 +121,10 @@ function errorCallback(errorMessage) {
 }
 
 function startRequest() {
+    //load currently stored options configuration
+    var timeout_value = localStorage['timeout'];
+    var pollInterval = 1000 * 60 * timeout_value; // configured by options
+
     updateStocks();
     var now = new Date().getHours();
     if (now < 14) {
@@ -120,7 +133,7 @@ function startRequest() {
     else {
         chrome.notifications.create('All Done', {
             type: 'basic',
-            iconUrl: 'images/icon.png',
+            iconUrl: 'images/icon_128.png',
             title: 'Market Closed',
             message: 'No more notifications, market closed.'
         }, function (notificationId) { });
@@ -130,5 +143,13 @@ function startRequest() {
 function stopRequest() {
     window.clearTimeout(timerId);
 }
+
+chrome.runtime.onMessage.addListener(
+  function (request, sender, sendResponse) {
+      if (request.message === "options_saved") {
+          startRequest();
+      }
+  }
+);
 
 onload = startRequest();
