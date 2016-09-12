@@ -1,9 +1,6 @@
-//load currently stored options configuration
-var timeout_value = localStorage['timeout'];
-var pollInterval = 1000 * 60 * timeout_value; // configured by options
+
 
 function updateStocks() {
-
     var searchUrl = 'https://www.google.com/finance/info?q=NSE:A,KEYS,.INX,TNX,.DJI';
     var x = new XMLHttpRequest();
     x.open('GET', searchUrl);
@@ -78,12 +75,12 @@ function updateStocks() {
 
 function showStockNotification(notificationName, titleString, stockName, current, change, pctChange) {
     var statusText = stockName + ' is ' + current + ', ' + change + ' (' + pctChange.toFixed(2) + "%)";
+    var normal_threshold_value = localStorage['normal_threshold'];
+    var special_threshold_value = localStorage['special_threshold'];
 
-
-
-    if (Math.abs(pctChange) > .25) {
+    if (Math.abs(pctChange) > normal_threshold_value) {
         var upArrowString = 'images/upArrow.png';
-        if (pctChange > 1.0) {
+        if (pctChange > special_threshold_value) {
             upArrowString = 'images/upArrowPriority.png';
         }
         if (pctChange >= 0) {
@@ -114,6 +111,10 @@ function errorCallback(errorMessage) {
 }
 
 function startRequest() {
+    //load currently stored options configuration
+    var timeout_value = localStorage['timeout'];
+    var pollInterval = 1000 * 60 * timeout_value; // configured by options
+
     updateStocks();
     var now = new Date().getHours();
     if (now < 14) {
